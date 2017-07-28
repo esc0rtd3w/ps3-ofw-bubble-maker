@@ -16,6 +16,7 @@ set ip=0.0.0.0
 set tempFile="%temp%\ps3-ofw-bubble-maker---temp.txt"
 set tempText="%temp%\ps3-ofw-bubble-maker---temp---installText.txt"
 
+set taskNumberBase=00000000
 set pkgNumberBase=80000000
 set pkgTotal=1
 
@@ -28,13 +29,14 @@ set iconFileName=ICON_FILE
 set dZeroChunkData=d0_chunk1.bin+d0_chunk2.bin+d0_chunk3.bin+d0_chunk4.bin+d0_chunk5.bin
 
 set root=%~dp0
-set pathOutput=%root%\output\vsh\game_pkg
-set pathRemote=/dev_hdd0/vsh/game_pkg
+set pathOutput=%root%\output\vsh
+set pathRemote=/dev_hdd0/vsh
 
 :: Template Variables
 set pathTemplate=%root%\template
 set pathTemplateVSH=%pathTemplate%\dev_hdd0\vsh
 set pathTemplateGamePKG=%pathTemplateVSH%\game_pkg
+set pathTemplateTask=%pathTemplateVSH%\task
 set pkgTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\000000000000000000000000000000001.pkg
 set dZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\d0.pdb
 set dZeroChunkOne=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk1.bin
@@ -52,11 +54,16 @@ set iconFileTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\ICON_FILE
 
 set createAnotherBubble=0
 
+set charsMax=47
+set charsTotal=0
+set charsPadding=0
+
 
 
 :menu
 
-if not exist "%pathOutput%" mkdir "%pathOutput%"
+if not exist "%pathOutput%\game_pkg\%pkgNumberBase%" mkdir "%pathOutput%\game_pkg\%pkgNumberBase%"
+if not exist "%pathOutput%\task\%taskNumberBase%" mkdir "%pathOutput%\task\%taskNumberBase%"
 
 color 0e
 
@@ -73,7 +80,7 @@ echo.
 
 set /p pkgInput=
 
-echo f | xcopy /y %pkgInput% "%pathOutput%\%pkgNumberBase%\%pkgName%"
+echo f | xcopy /y %pkgInput% "%pathOutput%\game_pkg\%pkgNumberBase%\%pkgName%"
 
 
 :installText
@@ -90,26 +97,52 @@ echo.
 
 set /p installTextInput=
 
-echo %installTextInput%>"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
-echo %pkgNumberBase%>"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
+echo %installTextInput%>%temp%\installTextInput.txt
+
+:: Get Characters
+setlocal enabledelayedexpansion
+set /p installTextInputTemp=<%temp%\installTextInput.txt
+set "str=A!installTextInputTemp!"
+set "len=0"
+
+for /L %%A in (12,-1,0) do (
+    set /a "len|=1<<%%A"
+    for %%B in (!len!) do if "!str:~%%B,1!"=="" set /a "len&=~1<<%%A"
+	echo !len!>%temp%\charsTotal.txt
+)
+endlocal
+
+set /p charsTotal=<%temp%\charsTotal.txt
+
+del /f /q "%temp%\installTextInput.txt"
+del /f /q "%temp%\charsTotal.txt"
+cls
+set /a charsPadding=%charsMax%-%charsTotal%
+echo Max Chars: %charsMax%
+echo Total Chars: %charsTotal%
+echo Padding Chars: %charsPadding%
+pause
+
+echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"
 
 :: Build d0.pdb and d1.pdb
-xcopy /y "%dZeroChunkOne%" "%pathOutput%\%pkgNumberBase%\*"
-::xcopy /y "%dZeroChunkTwo%" "%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
-xcopy /y "%dZeroChunkThree%" "%pathOutput%\%pkgNumberBase%\*"
-::xcopy /y "%dZeroChunkFour%" "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
-xcopy /y "%dZeroChunkFive%" "%pathOutput%\%pkgNumberBase%\*"
-xcopy /y "%fZeroTemplate%" "%pathOutput%\%pkgNumberBase%\*"
+xcopy /y "%dZeroChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+::xcopy /y "%dZeroChunkTwo%" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+xcopy /y "%dZeroChunkThree%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+::xcopy /y "%dZeroChunkFour%" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"
+xcopy /y "%dZeroChunkFive%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+xcopy /y "%fZeroTemplate%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 
-xcopy /y "%dOneChunkZero%" "%pathOutput%\%pkgNumberBase%\*"
-xcopy /y "%dOneChunkOne%" "%pathOutput%\%pkgNumberBase%\*"
-xcopy /y "%dOneChunkTwo%" "%pathOutput%\%pkgNumberBase%\*"
-xcopy /y "%dOneChunkThree%" "%pathOutput%\%pkgNumberBase%\*"
+xcopy /y "%dOneChunkZero%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+xcopy /y "%dOneChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+xcopy /y "%dOneChunkTwo%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+xcopy /y "%dOneChunkThree%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 
 
-copy /y "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk5.bin" "%pathOutput%\%pkgNumberBase%\d0.pdb"
+copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk3.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk5.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0.pdb"
 
-copy /y "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk0.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk3.bin" "%pathOutput%\%pkgNumberBase%\d1.pdb"
+copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk0.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk5.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk3.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1.pdb"
 
 
 
@@ -127,19 +160,19 @@ echo.
 
 set /p iconInput=
 
-copy /y %iconInput% "%pathOutput%\%pkgNumberBase%\%iconFileName%"
-
+copy /y %iconInput% "%pathOutput%\game_pkg\%pkgNumberBase%\%iconFileName%"
+copy /y %iconInput% "%pathOutput%\task\%taskNumberBase%\%iconFileName%"
 
 :: Cleanup
-del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk0.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk1.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk2.bin"
-del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk3.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk3.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk5.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk0.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk1.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk3.bin"
 
 
 ::set pathRemote=%pathRemote%/%pkgNumberBase%
@@ -175,17 +208,19 @@ echo.
 echo Sending Bubbles to %ip%@%remotePath%....
 echo.
 echo.
-echo cd "%pathOutput%">%tempFile%
 echo user ps3>>%tempFile%
 echo ps3>>%tempFile%
 echo bin>>%tempFile%
-echo mkdir %pathRemote%/%pkgNumberBase%>>%tempFile%
-echo cd %pathRemote%/%pkgNumberBase%>>%tempFile%
-echo put "%pathOutput%\%pkgNumberBase%\%pkgName%">>%tempFile%
-echo put "%pathOutput%\%pkgNumberBase%\%dZeroName%">>%tempFile%
-echo put "%pathOutput%\%pkgNumberBase%\%dOneName%">>%tempFile%
-echo put "%pathOutput%\%pkgNumberBase%\%fZeroName%">>%tempFile%
-echo put "%pathOutput%\%pkgNumberBase%\%iconFileName%">>%tempFile%
+echo mkdir %pathRemote%/game_pkg/%pkgNumberBase%>>%tempFile%
+echo cd %pathRemote%/game_pkg/%pkgNumberBase%>>%tempFile%
+echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%pkgName%">>%tempFile%
+echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%dZeroName%">>%tempFile%
+echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%dOneName%">>%tempFile%
+echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%fZeroName%">>%tempFile%
+echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%iconFileName%">>%tempFile%
+echo mkdir %pathRemote%/task/%taskNumberBase%>>%tempFile%
+echo cd %pathRemote%/task/%taskNumberBase%>>%tempFile%
+echo put "%pathRemote%\task\%taskNumberBase%\%iconFileName%">>%tempFile%
 echo quit>>%tempFile%
 ftp -n -s:%tempFile% %ip%
 del /f /q %tempFile%
@@ -212,6 +247,7 @@ if %anotherBubbleChoice%==Y set createAnotherBubble=1
 if %anotherBubbleChoice%==n set createAnotherBubble=0
 if %anotherBubbleChoice%==N set createAnotherBubble=0
 
+set /a taskNumberBase=%taskNumberBase%+1
 set /a pkgNumberBase=%pkgNumberBase%+1
 set installTextInput=
 
