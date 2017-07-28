@@ -1,3 +1,6 @@
+
+:reset
+
 @echo off
 
 
@@ -6,6 +9,8 @@ title PS3 OFW Bubble Maker                                        esc0rtd3w 2017
 
 set sleepTime=1
 set sleep=ping -n %sleepTime% 127.0.0.1
+
+set ip=0.0.0.0
 
 
 set tempFile="%temp%\ps3-ofw-bubble-maker---temp.txt"
@@ -41,6 +46,8 @@ set dOneTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\d1.pdb
 set fZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\f0.pdb
 set iconFileTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\ICON_FILE
 
+set createAnotherBubble=0
+
 
 
 :menu
@@ -50,6 +57,12 @@ if not exist "%pathOutput%" mkdir "%pathOutput%"
 color 0e
 
 cls
+echo Package Number Base [%pkgNumberBase%]
+echo Install Text [%installTextInput%]
+echo IP Address [%ip%]
+echo.
+echo.
+echo.
 echo Drag Package or Enter Path and Press ENTER:
 echo.
 echo.
@@ -59,7 +72,14 @@ set /p pkgInput=
 echo f | xcopy /y %pkgInput% "%pathOutput%\%pkgNumberBase%\%pkgName%"
 
 
+:installText
 cls
+echo Package Number Base [%pkgNumberBase%]
+echo Install Text [%installTextInput%]
+echo IP Address [%ip%]
+echo.
+echo.
+echo.
 echo Enter Install Text (47 Chars Max) and Press ENTER:
 echo.
 echo.
@@ -83,8 +103,14 @@ copy /y "%pathOutput%\%pkgNumberBase%\d0.pdb" "%pathOutput%\%pkgNumberBase%\d1.p
 
 
 
-
+:getIcon
 cls
+echo Package Number Base [%pkgNumberBase%]
+echo Install Text [%installTextInput%]
+echo IP Address [%ip%]
+echo.
+echo.
+echo.
 echo Drag Icon (320x176 PNG) For Package and Press ENTER:
 echo.
 echo.
@@ -102,12 +128,19 @@ del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
 del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"
 
 
-set pathRemote=%pathRemote%/%pkgNumberBase%
+::set pathRemote=%pathRemote%/%pkgNumberBase%
+
+:: If IP Address already set, use previous
+if %ip%==0.0.0.0 goto getIP
+if not %ip%==0.0.0.0 goto doFTP
 
 
 :getIP
 cls
-echo Current IP: %ip%
+echo Package Number Base [%pkgNumberBase%]
+echo Install Text [%installTextInput%]
+echo IP Address [%ip%]
+echo.
 echo.
 echo.
 echo Enter PS3 IP Address and press ENTER:
@@ -117,6 +150,11 @@ echo.
 set /p ip=
 
 
+:doFTP
+cls
+echo Package Number Base [%pkgNumberBase%]
+echo Install Text [%installTextInput%]
+echo IP Address [%ip%]
 echo.
 echo.
 echo.
@@ -127,8 +165,8 @@ echo cd "%pathOutput%">%tempFile%
 echo user ps3>>%tempFile%
 echo ps3>>%tempFile%
 echo bin>>%tempFile%
-echo mkdir %pathRemote%>>%tempFile%
-echo cd %pathRemote%>>%tempFile%
+echo mkdir %pathRemote%/%pkgNumberBase%>>%tempFile%
+echo cd %pathRemote%/%pkgNumberBase%>>%tempFile%
 echo put "%pathOutput%\%pkgNumberBase%\%pkgName%">>%tempFile%
 echo put "%pathOutput%\%pkgNumberBase%\%dZeroName%">>%tempFile%
 echo put "%pathOutput%\%pkgNumberBase%\%dOneName%">>%tempFile%
@@ -139,9 +177,35 @@ ftp -n -s:%tempFile% %ip%
 del /f /q %tempFile%
 
 
+:finish
+set anotherBubbleChoice=n
+
+cls
+echo Create Another Bubble?
+echo.
+echo.
+echo Y) Yes
+echo.
+echo N) No
+echo.
+echo.
+
+set /p anotherBubbleChoice=
+
+
+if %anotherBubbleChoice%==y set createAnotherBubble=1
+if %anotherBubbleChoice%==Y set createAnotherBubble=1
+if %anotherBubbleChoice%==n set createAnotherBubble=0
+if %anotherBubbleChoice%==N set createAnotherBubble=0
+
+set /a pkgNumberBase=%pkgNumberBase%+1
+set installTextInput=
+
+if %createAnotherBubble%==1 goto menu
+
 
 
 :end
 
-pause
+::pause
 
