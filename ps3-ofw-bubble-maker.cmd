@@ -42,6 +42,10 @@ set dZeroChunkTwo=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk2.bin
 set dZeroChunkThree=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk3.bin
 set dZeroChunkFour=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk4.bin
 set dZeroChunkFive=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk5.bin
+set dOneChunkZero=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk0.bin
+set dOneChunkOne=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk1.bin
+set dOneChunkTwo=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk2.bin
+set dOneChunkThree=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk3.bin
 set dOneTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\d1.pdb
 set fZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\f0.pdb
 set iconFileTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\ICON_FILE
@@ -96,6 +100,11 @@ xcopy /y "%dZeroChunkThree%" "%pathOutput%\%pkgNumberBase%\*"
 ::xcopy /y "%dZeroChunkFour%" "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
 xcopy /y "%dZeroChunkFive%" "%pathOutput%\%pkgNumberBase%\*"
 xcopy /y "%fZeroTemplate%" "%pathOutput%\%pkgNumberBase%\*"
+
+xcopy /y "%dOneChunkZero%" "%pathOutput%\%pkgNumberBase%\*"
+xcopy /y "%dOneChunkOne%" "%pathOutput%\%pkgNumberBase%\*"
+xcopy /y "%dOneChunkTwo%" "%pathOutput%\%pkgNumberBase%\*"
+xcopy /y "%dOneChunkThree%" "%pathOutput%\%pkgNumberBase%\*"
 
 
 copy /y "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk5.bin" "%pathOutput%\%pkgNumberBase%\d0.pdb"
