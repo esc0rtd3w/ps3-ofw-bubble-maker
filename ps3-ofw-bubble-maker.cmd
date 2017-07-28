@@ -99,7 +99,8 @@ xcopy /y "%fZeroTemplate%" "%pathOutput%\%pkgNumberBase%\*"
 
 
 copy /y "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk5.bin" "%pathOutput%\%pkgNumberBase%\d0.pdb"
-copy /y "%pathOutput%\%pkgNumberBase%\d0.pdb" "%pathOutput%\%pkgNumberBase%\d1.pdb"
+
+copy /y "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk0.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d1_chunk3.bin" "%pathOutput%\%pkgNumberBase%\d1.pdb"
 
 
 
@@ -126,6 +127,10 @@ del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
 del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"
 del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
 del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk0.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk1.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk2.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d1_chunk3.bin"
 
 
 ::set pathRemote=%pathRemote%/%pkgNumberBase%
