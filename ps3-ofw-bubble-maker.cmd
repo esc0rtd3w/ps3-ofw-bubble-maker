@@ -102,7 +102,7 @@ del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
 del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"
 
 
-set pathRemote=%pathRemote%\%pkgNumberBase%
+set pathRemote=%pathRemote%/%pkgNumberBase%
 
 
 :getIP
@@ -127,6 +127,7 @@ echo cd "%pathOutput%">%tempFile%
 echo user ps3>>%tempFile%
 echo ps3>>%tempFile%
 echo bin>>%tempFile%
+echo mkdir %pathRemote%>>%tempFile%
 echo cd %pathRemote%>>%tempFile%
 echo put "%pathOutput%\%pkgNumberBase%\%pkgName%">>%tempFile%
 echo put "%pathOutput%\%pkgNumberBase%\%dZeroName%">>%tempFile%
