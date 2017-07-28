@@ -3,6 +3,11 @@
 
 title PS3 OFW Bubble Maker                                        esc0rtd3w 2017
 
+
+set sleepTime=1
+set sleep=ping -n %sleepTime% 127.0.0.1
+
+
 set tempFile="%temp%\ps3-ofw-bubble-maker---temp.txt"
 set tempText="%temp%\ps3-ofw-bubble-maker---temp---installText.txt"
 
@@ -51,8 +56,7 @@ echo.
 
 set /p pkgInput=
 
-xcopy /y %pkgInput% "%pathOutput%\%pkgNumberBase%\%pkgName%"
-
+echo f | xcopy /y %pkgInput% "%pathOutput%\%pkgNumberBase%\%pkgName%"
 
 
 cls
@@ -62,14 +66,16 @@ echo.
 
 set /p installTextInput=
 
-echo %installTextInput%>"%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"
+echo %installTextInput%>"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
+echo %pkgNumberBase%>"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
 
 :: Build d0.pdb and d1.pdb
-xcopy /y "%dZeroChunkOne%" "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"
-xcopy /y "%dZeroChunkTwo%" "%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
-::xcopy /y "%dZeroChunkThree%" "%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"
-xcopy /y "%dZeroChunkFour%" "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
-xcopy /y "%dZeroChunkFive%" "%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"
+xcopy /y "%dZeroChunkOne%" "%pathOutput%\%pkgNumberBase%\*"
+::xcopy /y "%dZeroChunkTwo%" "%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
+xcopy /y "%dZeroChunkThree%" "%pathOutput%\%pkgNumberBase%\*"
+::xcopy /y "%dZeroChunkFour%" "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
+xcopy /y "%dZeroChunkFive%" "%pathOutput%\%pkgNumberBase%\*"
+xcopy /y "%fZeroTemplate%" "%pathOutput%\%pkgNumberBase%\*"
 
 
 copy /y "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"+"%pathOutput%\%pkgNumberBase%\d0_chunk5.bin" "%pathOutput%\%pkgNumberBase%\d0.pdb"
@@ -85,9 +91,18 @@ echo.
 
 set /p iconInput=
 
-xcopy /y %iconInput% "%pathOutput%\%pkgNumberBase%\%iconFileName%"
+copy /y %iconInput% "%pathOutput%\%pkgNumberBase%\%iconFileName%"
 
 
+:: Cleanup
+del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk1.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk2.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk3.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk4.bin"
+del /f /q "%pathOutput%\%pkgNumberBase%\d0_chunk5.bin"
+
+
+set pathRemote=%pathRemote%\%pkgNumberBase%
 
 
 :getIP
