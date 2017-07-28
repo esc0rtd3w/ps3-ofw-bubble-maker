@@ -116,12 +116,17 @@ set /p charsTotal=<%temp%\charsTotal.txt
 
 del /f /q "%temp%\installTextInput.txt"
 del /f /q "%temp%\charsTotal.txt"
-cls
+
+::cls
 set /a charsPadding=%charsMax%-%charsTotal%
-echo Max Chars: %charsMax%
-echo Total Chars: %charsTotal%
-echo Padding Chars: %charsPadding%
-pause
+::echo Max Chars: %charsMax%
+::echo Total Chars: %charsTotal%
+::echo Padding Chars: %charsPadding%
+::pause
+
+
+:: If too many characters entered, return to installText again
+if %charsTotal% gtr 47 goto installText
 
 echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
 echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"
