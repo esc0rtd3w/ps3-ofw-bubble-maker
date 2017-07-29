@@ -7,6 +7,9 @@
 title PS3 OFW Bubble Maker                                        esc0rtd3w 2017
 
 
+:: Set "1" To Enable Debug Output
+set debug=1
+
 set sleepTime=1
 set sleep=ping -n %sleepTime% 127.0.0.1
 
@@ -58,6 +61,9 @@ set charsMax=47
 set charsTotal=0
 set charsPadding=0
 
+:: 47 Spaces
+set paddingData=                                               
+
 
 
 :menu
@@ -101,6 +107,7 @@ echo %installTextInput%>%temp%\installTextInput.txt
 
 :: Get Characters
 setlocal enabledelayedexpansion
+
 set /p installTextInputTemp=<%temp%\installTextInput.txt
 set "str=A!installTextInputTemp!"
 set "len=0"
@@ -110,25 +117,106 @@ for /L %%A in (12,-1,0) do (
     for %%B in (!len!) do if "!str:~%%B,1!"=="" set /a "len&=~1<<%%A"
 	echo !len!>%temp%\charsTotal.txt
 )
+
 endlocal
 
 set /p charsTotal=<%temp%\charsTotal.txt
 
+%sleep%
+
+setlocal enabledelayedexpansion
+
+set /p charsTotalTemp=<%temp%\charsTotal.txt
+set /a charsPaddingTemp=47-%charsTotalTemp%
+
+:: Some Super Hacky Padding
+for %%a in (%charsPaddingTemp%) do (
+    for /f "tokens=*" %%F in ("%%a") do (
+	   set /a num=%%F
+       set spaces=
+       if !num! equ 47 set spaces=.
+       if !num! equ 46 set spaces= .
+       if !num! equ 45 set spaces=  .
+       if !num! equ 44 set spaces=   .
+       if !num! equ 43 set spaces=    .
+       if !num! equ 42 set spaces=     .
+       if !num! equ 41 set spaces=      .
+       if !num! equ 40 set spaces=       .
+       if !num! equ 39 set spaces=        .
+       if !num! equ 38 set spaces=         .
+       if !num! equ 37 set spaces=          .
+       if !num! equ 36 set spaces=           .
+       if !num! equ 35 set spaces=            .
+       if !num! equ 34 set spaces=             .
+       if !num! equ 33 set spaces=              .
+       if !num! equ 32 set spaces=               .
+       if !num! equ 31 set spaces=                .
+       if !num! equ 30 set spaces=                 .
+       if !num! equ 29 set spaces=                  .
+       if !num! equ 28 set spaces=                   .
+       if !num! equ 27 set spaces=                    .
+       if !num! equ 26 set spaces=                     .
+       if !num! equ 25 set spaces=                      .
+       if !num! equ 24 set spaces=                       .
+       if !num! equ 23 set spaces=                        .
+       if !num! equ 22 set spaces=                         .
+       if !num! equ 21 set spaces=                          .
+       if !num! equ 20 set spaces=                           .
+       if !num! equ 19 set spaces=                            .
+       if !num! equ 18 set spaces=                             .
+       if !num! equ 17 set spaces=                              .
+       if !num! equ 16 set spaces=                               .
+       if !num! equ 15 set spaces=                                .
+       if !num! equ 14 set spaces=                                 .
+       if !num! equ 13 set spaces=                                  .
+       if !num! equ 12 set spaces=                                   .
+       if !num! equ 11 set spaces=                                    .
+       if !num! equ 10 set spaces=                                     .
+       if !num! equ 9 set spaces=                                       .
+       if !num! equ 8 set spaces=                                        .
+       if !num! equ 7 set spaces=                                         .
+       if !num! equ 6 set spaces=                                          .
+       if !num! equ 5 set spaces=                                           .
+       if !num! equ 4 set spaces=                                            .
+       if !num! equ 3 set spaces=                                             .
+       if !num! equ 2 set spaces=                                              .
+       if !num! equ 1 set spaces=                                               .
+       if !num! equ 0 set spaces=                                                .
+       set "padding=!spaces!"
+       echo !padding!>"%temp%\installTextInputPadding.txt"
+    )
+)
+
+endlocal
+
+set /p paddingData=<%temp%\installTextInputPadding.txt
+
+
+
 del /f /q "%temp%\installTextInput.txt"
 del /f /q "%temp%\charsTotal.txt"
-
-::cls
-set /a charsPadding=%charsMax%-%charsTotal%
-::echo Max Chars: %charsMax%
-::echo Total Chars: %charsTotal%
-::echo Padding Chars: %charsPadding%
-::pause
-
 
 :: If too many characters entered, return to installText again
 if %charsTotal% gtr 47 goto installText
 
-echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+set /a charsPadding=%charsMax%-%charsTotal%
+
+if %debug%==1 (
+cls
+echo Max Chars: %charsMax%
+echo Total Chars: %charsTotal%
+echo Padding Chars: %charsPadding%
+echo Padding: %paddingData%
+pause
+)
+
+:: Create Text (a) and Padding (b) Chunks
+echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
+echo %paddingData%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
+
+:: Put Two Chunks Back Together
+copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+
 echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"
 
 :: Build d0.pdb and d1.pdb
@@ -171,6 +259,8 @@ copy /y %iconInput% "%pathOutput%\task\%taskNumberBase%\%iconFileName%"
 :: Cleanup
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk3.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk4.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk5.bin"
