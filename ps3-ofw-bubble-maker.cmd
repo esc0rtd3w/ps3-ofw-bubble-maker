@@ -164,8 +164,8 @@ pause
 
 
 :: Copt chunks to patch from template
-copy /y %dZeroChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
-copy /y %dOneChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
+::copy /y %dZeroChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+::copy /y %dOneChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
 copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
 
 :: Create 2 empty chunks to modify
@@ -179,15 +179,18 @@ copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
 :: Add padding to chunk2 (pad to 47 bytes total)
 %patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" /i0 /n%charsPadding% /s"%paddingData%"
 
-pause
 
 :: Put Two Chunks Back Together
-::copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
 
 :: The d1 value is the same as d0
 copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
 
+
 ::echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+
+:: Create new blank chunk to modify with package ID
+%newFile% 8 "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
 
 :: Create chunk4 from ID (80000000 default)
 %patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin" /i0 /n8 /s"%pkgNumberBase%"
