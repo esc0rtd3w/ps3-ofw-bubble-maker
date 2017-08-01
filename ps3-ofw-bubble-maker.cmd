@@ -298,6 +298,8 @@ echo.
 echo user ps3>>%tempFile%
 echo ps3>>%tempFile%
 echo bin>>%tempFile%
+echo mkdir %pathRemote%>>%tempFile%
+echo mkdir %pathRemote%/game_pkg>>%tempFile%
 echo mkdir %pathRemote%/game_pkg/%pkgNumberBase%>>%tempFile%
 echo cd %pathRemote%/game_pkg/%pkgNumberBase%>>%tempFile%
 echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%pkgName%">>%tempFile%
@@ -305,9 +307,10 @@ echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%dZeroName%">>%tempFile%
 echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%dOneName%">>%tempFile%
 echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%fZeroName%">>%tempFile%
 echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%iconFileName%">>%tempFile%
+echo mkdir %pathRemote%/task>>%tempFile%
 echo mkdir %pathRemote%/task/%taskNumberBase%>>%tempFile%
 echo cd %pathRemote%/task/%taskNumberBase%>>%tempFile%
-echo put "%pathRemote%\task\%taskNumberBase%\%iconFileName%">>%tempFile%
+echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%iconFileName%">>%tempFile%
 echo quit>>%tempFile%
 ftp -n -s:%tempFile% %ip%
 del /f /q %tempFile%
@@ -334,7 +337,7 @@ if %anotherBubbleChoice%==Y set createAnotherBubble=1
 if %anotherBubbleChoice%==n set createAnotherBubble=0
 if %anotherBubbleChoice%==N set createAnotherBubble=0
 
-set /a taskNumberBase=%taskNumberBase%+1
+::set /a taskNumberBase=%taskNumberBase%+1
 set /a pkgNumberBase=%pkgNumberBase%+1
 set installTextInput=
 
