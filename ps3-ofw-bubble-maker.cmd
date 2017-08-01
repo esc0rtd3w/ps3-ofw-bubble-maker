@@ -33,8 +33,20 @@ set dZeroChunkData=d0_chunk1.bin+d0_chunk2.bin+d0_chunk3.bin
 set dOneChunkData=d1_chunk1.bin+d1_chunk2.bin+d1_chunk3.bin+d1_chunk4.bin+d1_chunk5.bin
 
 set root=%~dp0
+set pathBin=%root%\bin
 set pathOutput=%root%\output\vsh
 set pathRemote=/dev_hdd0/vsh
+
+set patch="%pathBin%\gpatch.exe" /nologo
+set patchRecursive="%pathBin%\gpatch.exe" /nologo /r
+set patchData=0
+set patchIndex=/i
+set patchHex=/h
+set patchLength=/n
+set patchString=/s
+
+set newFile="%pathBin%\newfile.exe"
+
 
 :: Template Variables
 set pathTemplate=%root%\template
@@ -104,6 +116,7 @@ echo.
 
 set /p installTextInput=
 
+
 echo %installTextInput%>%temp%\installTextInput.txt
 
 :: Get Characters
@@ -122,12 +135,6 @@ for /L %%A in (12,-1,0) do (
 endlocal
 
 set /p charsTotal=<%temp%\charsTotal.txt
-
-%sleep%
-
-setlocal enabledelayedexpansion
-
-set /p charsTotalTemp=<%temp%\charsTotal.txt
 set /a charsPaddingTemp=47-%charsTotalTemp%
 
 set /p paddingData=<%temp%\installTextInputPadding.txt
@@ -152,16 +159,38 @@ pause
 )
 
 :: Create Text (a) and Padding (b) Chunks
-echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
-echo %paddingData%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
+::echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
+::echo %paddingData%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
+
+
+:: Copt chunks to patch from template
+copy /y %dZeroChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+copy /y %dOneChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
+copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+
+:: Create 2 empty chunks to modify
+%newFile% %charsTotal% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
+%newFile% %charsPadding% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
+
+
+:: Patch chunk2 with new Install Text
+%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin" /i0 /n%charsTotal% /s"%installTextInput%"
+
+:: Add padding to chunk2 (pad to 47 bytes total)
+%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" /i0 /n%charsPadding% /s"%paddingData%"
+
+pause
 
 :: Put Two Chunks Back Together
-copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+::copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
 
 :: The d1 value is the same as d0
 copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
 
-echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+::echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+
+:: Create chunk4 from ID (80000000 default)
+%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin" /i0 /n8 /s"%pkgNumberBase%"
 
 :: Build d0.pdb and d1.pdb
 xcopy /y "%dZeroChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
