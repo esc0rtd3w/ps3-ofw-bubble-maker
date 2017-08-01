@@ -4,7 +4,7 @@
 @echo off
 
 
-title PS3 OFW Bubble Maker                                        esc0rtd3w 2017
+title PS3 OFW Bubble Maker for DTU Method                                        esc0rtd3w 2017
 
 
 :: Set "1" To Enable Debug Output
@@ -46,6 +46,7 @@ set patchLength=/n
 set patchString=/s
 
 set newFile="%pathBin%\newfile.exe"
+set partCopy="%pathBin%\partcopy.exe"
 
 
 :: Template Variables
@@ -217,9 +218,14 @@ xcopy /y "%dOneChunkThree%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 xcopy /y "%dOneChunkFive%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 
 
-copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk3.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0.pdb"
+copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk3.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_temp.pdb"
 
-copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk3.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk5.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1.pdb"
+copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk3.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk5.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1_temp.pdb"
+
+
+:: Trim 1 byte from the end (fix later)
+%partCopy% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_temp.pdb"  "%pathOutput%\game_pkg\%pkgNumberBase%\d0.pdb" 0h 146h
+%partCopy% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_temp.pdb"  "%pathOutput%\game_pkg\%pkgNumberBase%\d1.pdb" 0h 17ch
 
 
 
@@ -252,6 +258,8 @@ del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk3.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4_default.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk5.bin"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_temp.pdb"
+del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_temp.pdb"
 
 
 ::set pathRemote=%pathRemote%/%pkgNumberBase%
