@@ -8,7 +8,7 @@ title PS3 OFW Bubble Maker                                        esc0rtd3w 2017
 
 
 :: Set "1" To Enable Debug Output
-set debug=1
+set debug=0
 
 set sleepTime=1
 set sleep=ping -n %sleepTime% 127.0.0.1
@@ -62,7 +62,6 @@ set dOneChunkOne=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk1.bin
 set dOneChunkTwo=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk2.bin
 set dOneChunkThree=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk3.bin
 set dOneChunkFour=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk4.bin
-set dOneChunkFourDefault=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk4_default.bin
 set dOneChunkFive=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk5.bin
 set dOneTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\d1.pdb
 set fZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\f0.pdb
@@ -158,30 +157,37 @@ echo Padding: %paddingData%
 pause
 )
 
+
+:: ----- OLD Chunk stuff -----
 :: Create Text (a) and Padding (b) Chunks
 ::echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
 ::echo %paddingData%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
 
-
-:: Copt chunks to patch from template
+:: Copy chunks to patch from template
 ::copy /y %dZeroChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
 ::copy /y %dOneChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
-copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+::copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
 
 :: Create 2 empty chunks to modify
-%newFile% %charsTotal% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
-%newFile% %charsPadding% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
-
+::%newFile% %charsTotal% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
+::%newFile% %charsPadding% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
 
 :: Patch chunk2 with new Install Text
-%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin" /i0 /n%charsTotal% /s"%installTextInput%"
+::%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin" /i0 /n%charsTotal% /s"%installTextInput%"
 
 :: Add padding to chunk2 (pad to 47 bytes total)
-%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" /i0 /n%charsPadding% /s"%paddingData%"
-
+::%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" /i0 /n%charsPadding% /s"%paddingData%"
 
 :: Put Two Chunks Back Together
-copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+::copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+
+::%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin" /i0 /n%charsTotal% /s"%installTextInput%"
+
+
+:: Use the 47 byte file filled with spaces as a patch base for Install Text
+copy /y %dZeroChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
+%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin" /i0 /n%charsTotal% /s"%installTextInput%"
+
 
 :: The d1 value is the same as d0
 copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
@@ -190,10 +196,13 @@ copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin" "%pathOutput%\game
 ::echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
 
 :: Create new blank chunk to modify with package ID
-%newFile% 8 "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+::%newFile% 8 "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+
+copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
 
 :: Create chunk4 from ID (80000000 default)
 %patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin" /i0 /n8 /s"%pkgNumberBase%"
+
 
 :: Build d0.pdb and d1.pdb
 xcopy /y "%dZeroChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
