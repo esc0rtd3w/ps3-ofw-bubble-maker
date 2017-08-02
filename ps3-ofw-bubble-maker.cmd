@@ -45,28 +45,49 @@ set patchHex=/h
 set patchLength=/n
 set patchString=/s
 
+set cocolor="%pathBin%\cocolor.exe"
 set newFile="%pathBin%\newfile.exe"
 set partCopy="%pathBin%\partcopy.exe"
 
 
+:: Set Terminal Colors
+set black=%cocolor% 00
+set blue=%cocolor% 01
+set green=%cocolor% 02
+set aqua=%cocolor% 03
+set red=%cocolor% 04
+set purple=%cocolor% 05
+set yellow=%cocolor% 06
+set white=%cocolor% 07
+set grey=%cocolor% 08
+set lblue=%cocolor% 09
+set lgreen=%cocolor% 0a
+set laqua=%cocolor% 0b
+set lred=%cocolor% 0c
+set lpurple=%cocolor% 0d
+set lyellow=%cocolor% 0e
+set lwhite=%cocolor% 0f
+
+
 :: Template Variables
+set pkgNumberBaseTemplate=80000000
 set pathTemplate=%root%\template
 set pathTemplateVSH=%pathTemplate%\dev_hdd0\vsh
 set pathTemplateGamePKG=%pathTemplateVSH%\game_pkg
 set pathTemplateTask=%pathTemplateVSH%\task
-set pkgTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\000000000000000000000000000000001.pkg
-set dZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\d0.pdb
-set dZeroChunkOne=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk1.bin
-set dZeroChunkTwo=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk2.bin
-set dZeroChunkThree=%pathTemplateGamePKG%\%pkgNumberBase%\d0_chunk3.bin
-set dOneChunkOne=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk1.bin
-set dOneChunkTwo=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk2.bin
-set dOneChunkThree=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk3.bin
-set dOneChunkFour=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk4.bin
-set dOneChunkFive=%pathTemplateGamePKG%\%pkgNumberBase%\d1_chunk5.bin
-set dOneTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\d1.pdb
-set fZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\f0.pdb
-set iconFileTemplate=%pathTemplateGamePKG%\%pkgNumberBase%\ICON_FILE
+set pkgTemplate=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\000000000000000000000000000000001.pkg
+set dZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d0.pdb
+set dZeroChunkOne=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d0_chunk1.bin
+set dZeroChunkTwo=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d0_chunk2.bin
+set dZeroChunkThree=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d0_chunk3.bin
+set dOneChunkOne=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d1_chunk1.bin
+set dOneChunkTwo=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d1_chunk2.bin
+set dOneChunkThree=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d1_chunk3.bin
+set dOneChunkFour=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d1_chunk4.bin
+set dOneChunkFive=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d1_chunk5.bin
+set dOneTemplate=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\d1.pdb
+set fZeroTemplate=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\f0.pdb
+set iconFileTemplate=%pathTemplateGamePKG%\%pkgNumberBaseTemplate%\ICON_FILE
 
 set createAnotherBubble=0
 
@@ -88,12 +109,15 @@ color 0e
 
 cls
 echo Package Number Base [%pkgNumberBase%]
+echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
 echo.
 echo.
 echo.
+%laqua%
 echo Drag Package or Enter Path and Press ENTER:
+%lyellow%
 echo.
 echo.
 
@@ -105,12 +129,15 @@ echo f | xcopy /y %pkgInput% "%pathOutput%\game_pkg\%pkgNumberBase%\%pkgName%"
 :installText
 cls
 echo Package Number Base [%pkgNumberBase%]
+echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
 echo.
 echo.
 echo.
+%laqua%
 echo Enter Install Text (47 Chars Max) and Press ENTER:
+%lyellow%
 echo.
 echo.
 
@@ -137,7 +164,7 @@ endlocal
 set /p charsTotal=<%temp%\charsTotal.txt
 set /a charsPaddingTemp=47-%charsTotalTemp%
 
-set /p paddingData=<%temp%\installTextInputPadding.txt
+::set /p paddingData=<%temp%\installTextInputPadding.txt
 
 
 
@@ -149,6 +176,7 @@ if %charsTotal% gtr 47 goto installText
 
 set /a charsPadding=%charsMax%-%charsTotal%
 
+
 if %debug%==1 (
 cls
 echo Max Chars: %charsMax%
@@ -159,94 +187,75 @@ pause
 )
 
 
-:: ----- OLD Chunk stuff -----
-:: Create Text (a) and Padding (b) Chunks
-::echo %installTextInput%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
-::echo %paddingData%>"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
+:: ------------
+:: Build d0.pdb
+:: ------------
 
-:: Copy chunks to patch from template
-::copy /y %dZeroChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
-::copy /y %dOneChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
-::copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
+:: Chunk 1
+:: Copy From Template
+xcopy /y "%dZeroChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 
-:: Create 2 empty chunks to modify
-::%newFile% %charsTotal% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
-::%newFile% %charsPadding% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin"
-
-:: Patch chunk2 with new Install Text
-::%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin" /i0 /n%charsTotal% /s"%installTextInput%"
-
-:: Add padding to chunk2 (pad to 47 bytes total)
-::%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" /i0 /n%charsPadding% /s"%paddingData%"
-
-:: Put Two Chunks Back Together
-::copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2b.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
-
-::%patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin" /i0 /n%charsTotal% /s"%installTextInput%"
-
-
-:: Use the 47 byte file filled with spaces as a patch base for Install Text
+:: Chunk 2
+:: Copy From Template and Use the 47 byte file filled with spaces as a patch base for Install Text
 copy /y %dZeroChunkTwo% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
 %patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin" /i0 /n%charsTotal% /s"%installTextInput%"
 
+:: Chunk 3
+:: Copy From Template
+xcopy /y "%dZeroChunkThree%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 
-:: The d1 value is the same as d0
+
+:: ------------
+:: Build d1.pdb
+:: ------------
+
+:: Chunk 1
+:: Copy From Template
+xcopy /y "%dOneChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+
+:: Chunk 2
+:: The d1 value is the same as d0, so copy the chunk2 from d0
 copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"
 
+:: Chunk 3
+:: Copy From Template
+xcopy /y "%dOneChunkThree%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 
-::echo %pkgNumberBase%>"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
-
-:: Create new blank chunk to modify with package ID
-::%newFile% 8 "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
-
+:: Chunk 4
+:: Copy From Template and Create chunk4 from current Package ID
 copy /y %dOneChunkFour% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"
-
-:: Create chunk4 from ID (80000000 default)
 %patch% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin" /i0 /n8 /s"%pkgNumberBase%"
 
-
-:: Build d0.pdb and d1.pdb
-xcopy /y "%dZeroChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
-::xcopy /y "%dZeroChunkTwo%" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
-xcopy /y "%dZeroChunkThree%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
-xcopy /y "%fZeroTemplate%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
-
-xcopy /y "%dOneChunkOne%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
-::xcopy /y "%dOneChunkTwo%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
-xcopy /y "%dOneChunkThree%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
-::xcopy /y "%dOneChunkFour%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+:: Chunk 5
+:: Copy From Template
 xcopy /y "%dOneChunkFive%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
 
 
+:: ------------
+:: Build f0.pdb
+:: ------------
+
+:: Copy f0 File (zero-byte file)
+xcopy /y "%fZeroTemplate%" "%pathOutput%\game_pkg\%pkgNumberBase%\*"
+
+
+:: -------------------------------------
+:: Create New Database Files From Chunks
+:: -------------------------------------
+
+:: Create Temp d0 File From Chunks For Patching
 copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk3.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d0_temp.pdb"
 
+:: Create Temp d1 File From Chunks For Patching
 copy /y "%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk1.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk2.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk3.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk4.bin"+"%pathOutput%\game_pkg\%pkgNumberBase%\d1_chunk5.bin" "%pathOutput%\game_pkg\%pkgNumberBase%\d1_temp.pdb"
 
 
-:: Trim 1 byte from the end (fix later)
+:: Create New Valid d0.pdb and d1.pdb Files By Trimming 1 byte from the end (fix later)
 %partCopy% "%pathOutput%\game_pkg\%pkgNumberBase%\d0_temp.pdb"  "%pathOutput%\game_pkg\%pkgNumberBase%\d0.pdb" 0h 146h
 %partCopy% "%pathOutput%\game_pkg\%pkgNumberBase%\d1_temp.pdb"  "%pathOutput%\game_pkg\%pkgNumberBase%\d1.pdb" 0h 17ch
 
 
-
-:getIcon
-cls
-echo Package Number Base [%pkgNumberBase%]
-echo Install Text [%installTextInput%]
-echo IP Address [%ip%]
-echo.
-echo.
-echo.
-echo Drag Icon (320x176 PNG) For Package and Press ENTER:
-echo.
-echo.
-
-set /p iconInput=
-
-copy /y %iconInput% "%pathOutput%\game_pkg\%pkgNumberBase%\%iconFileName%"
-copy /y %iconInput% "%pathOutput%\task\%taskNumberBase%\%iconFileName%"
-
-:: Cleanup
+:: Cleanup All Temp Chunk Data
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk1.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2.bin"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_chunk2a.bin"
@@ -262,7 +271,27 @@ del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d0_temp.pdb"
 del /f /q "%pathOutput%\game_pkg\%pkgNumberBase%\d1_temp.pdb"
 
 
-::set pathRemote=%pathRemote%/%pkgNumberBase%
+
+:getIcon
+cls
+echo Package Number Base [%pkgNumberBase%]
+echo Package File [%pkgInput%]
+echo Install Text [%installTextInput%]
+echo IP Address [%ip%]
+echo.
+echo.
+echo.
+%laqua%
+echo Drag Icon (320x176 PNG) For Package and Press ENTER:
+%lyellow%
+echo.
+echo.
+
+set /p iconInput=
+
+copy /y %iconInput% "%pathOutput%\game_pkg\%pkgNumberBase%\%iconFileName%"
+copy /y %iconInput% "%pathOutput%\task\%taskNumberBase%\%iconFileName%"
+
 
 :: If IP Address already set, use previous
 if %ip%==0.0.0.0 goto getIP
@@ -272,12 +301,15 @@ if not %ip%==0.0.0.0 goto doFTP
 :getIP
 cls
 echo Package Number Base [%pkgNumberBase%]
+echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
 echo.
 echo.
 echo.
+%laqua%
 echo Enter PS3 IP Address and press ENTER:
+%lyellow%
 echo.
 echo.
 
@@ -287,14 +319,19 @@ set /p ip=
 :doFTP
 cls
 echo Package Number Base [%pkgNumberBase%]
+echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
 echo.
 echo.
 echo.
+%laqua%
 echo Sending Bubbles to %ip%@%remotePath%....
+%lyellow%
 echo.
 echo.
+
+:: Create Text File With FTP Commands
 echo user ps3>>%tempFile%
 echo ps3>>%tempFile%
 echo bin>>%tempFile%
@@ -312,15 +349,30 @@ echo mkdir %pathRemote%/task/%taskNumberBase%>>%tempFile%
 echo cd %pathRemote%/task/%taskNumberBase%>>%tempFile%
 echo put "%pathOutput%\game_pkg\%pkgNumberBase%\%iconFileName%">>%tempFile%
 echo quit>>%tempFile%
+
+:: Activate FTP Session
 ftp -n -s:%tempFile% %ip%
+
+:: Remove FTP Commands Text File
 del /f /q %tempFile%
 
 
 :finish
+
+:: Increase Package ID Number
+set /a pkgNumberBase=%pkgNumberBase%+1
+
+:: Reset Package Install Text
+set installTextInput=
+
+:: Set Default New Bubble Choice
 set anotherBubbleChoice=n
 
 cls
 echo Create Another Bubble?
+echo.
+echo Next Package ID Number [%pkgNumberBase%]
+echo.
 echo.
 echo.
 echo Y) Yes
@@ -337,15 +389,15 @@ if %anotherBubbleChoice%==Y set createAnotherBubble=1
 if %anotherBubbleChoice%==n set createAnotherBubble=0
 if %anotherBubbleChoice%==N set createAnotherBubble=0
 
-::set /a taskNumberBase=%taskNumberBase%+1
-set /a pkgNumberBase=%pkgNumberBase%+1
-set installTextInput=
-
 if %createAnotherBubble%==1 goto menu
 
 
 
 :end
 
-::pause
+
+
+if %debug%==1 (
+pause
+)
 
