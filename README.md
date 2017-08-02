@@ -7,6 +7,8 @@ This will allow you to create bubbles on OFW using the DTU method and a CFW cons
 
 It lets you drag & drop packages, edit XMB text, and change icon. Everything is automated and it will transfer all created files to the PS3 when finished. If you continue to make bubbles, the IP address is saved so you don't have to re-enter it every time.
 
+Supports multiple bubble creation (not sure the limit!!!) and will automatically increment the output directory number to create new bubbles.
+
 From my testing, it will allow you to install any ORIGINAL package on OFW from a cute little bubble. The benefit of this at the moment seems meaningless, but I thought it was a neat setup to get bubbles on OFW. Maybe better things will be in the future!!
 
 
