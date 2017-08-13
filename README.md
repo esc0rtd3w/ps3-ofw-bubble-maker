@@ -24,7 +24,7 @@ From my testing, it will allow you to install any ORIGINAL package on OFW from a
 <br/><br/>
 ![Image](http://i.imgur.com/QkjWIvY.png)
 <br/><br/>
-![Image](http://i.imgur.com/0U7MQWq.png)
+![Image](http://i.imgur.com/nJNyJZD.png)
 <br/><br/>
 ![Image](http://i.imgur.com/qeBYleh.png)
 <br/><br/>
