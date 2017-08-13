@@ -37,48 +37,9 @@ set pathRemoteRoot=/dev_hdd0
 ::set pathRemoteRoot=/dev_usb005
 
 :: Types [1 - CF / 2 - HDD / 3 - MS / 4 - SD / 5 - USB]
+:: Theses are the default types, they can be user selectable with a menu
 set pathRemoteRootType=2
 set usbSlot=0
-
-:: CF
-if %pathRemoteRootType%==1 (
-	set pathRemoteRoot=/dev_cf
-	set pathRemote=%pathRemoteRoot%
-)
-
-:: HDD
-if %pathRemoteRootType%==2 (
-	set pathRemoteRoot=/dev_hdd0
-	set pathRemote=%pathRemoteRoot%/vsh
-)
-
-:: MS
-if %pathRemoteRootType%==3 (
-	set pathRemoteRoot=/dev_ms
-	set pathRemote=%pathRemoteRoot%
-)
-
-:: SD
-if %pathRemoteRootType%==4 (
-	set pathRemoteRoot=/dev_sd
-	set pathRemote=%pathRemoteRoot%
-)
-
-:: USB
-if %pathRemoteRootType%==5 (
-
-	echo Select USB Slot and Press ENTER:
-	echo.
-	echo Default: 0
-	echo.
-	echo.
-	
-	set /p usbSlot=
-	
-	
-	set pathRemoteRoot=/dev_usb00%usbSlot%
-	set pathRemote=%pathRemoteRoot%
-)
 
 
 :: Set file location variables
@@ -180,7 +141,7 @@ echo Package Number Base [%pkgNumberBase%]
 echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
-echo Output Directory [%pathOutputRemote%]
+echo PS3 Output Directory [%pathRemote%]
 echo.
 echo.
 echo.
@@ -201,6 +162,7 @@ echo Package Number Base [%pkgNumberBase%]
 echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
+echo PS3 Output Directory [%pathRemote%]
 echo.
 echo.
 echo.
@@ -275,22 +237,76 @@ pause
 )
 
 
-:choosePath
+:choosePathR
 cls
 echo Package Number Base [%pkgNumberBase%]
 echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
+echo PS3 Output Directory [%pathRemote%]
 echo.
 echo.
 echo.
 %laqua%
-echo Enter Install Text (47 Chars Max) and Press ENTER:
+echo Choose Remote Output Path and Press ENTER:
+echo.
+echo Default: HDD
+echo.
+echo.
+echo 1) CF
+echo 2) HDD
+echo 3) MS
+echo 4) SD
+echo 5) USB
 %lyellow%
 echo.
 echo.
 
-set /p installTextInput=
+set /p pathRemoteRootType=
+
+if %pathRemoteRootType% lss 1 goto choosePathR
+if %pathRemoteRootType% gtr 5 goto choosePathR
+
+:: CF
+if %pathRemoteRootType%==1 (
+	set pathRemoteRoot=/dev_cf
+	set pathRemote=%pathRemoteRoot%
+)
+
+:: HDD
+if %pathRemoteRootType%==2 (
+	set pathRemoteRoot=/dev_hdd0
+	set pathRemote=%pathRemoteRoot%/vsh
+)
+
+:: MS
+if %pathRemoteRootType%==3 (
+	set pathRemoteRoot=/dev_ms
+	set pathRemote=%pathRemoteRoot%
+)
+
+:: SD
+if %pathRemoteRootType%==4 (
+	set pathRemoteRoot=/dev_sd
+	set pathRemote=%pathRemoteRoot%
+)
+
+:: USB
+if %pathRemoteRootType%==5 (
+
+	echo Select USB Slot and Press ENTER:
+	echo.
+	echo Default: 0
+	echo.
+	echo.
+	
+	%laqua%
+	set /p usbSlot=
+	%lyellow%
+	
+	set pathRemoteRoot=/dev_usb00%usbSlot%
+	set pathRemote=%pathRemoteRoot%
+)
 
 
 :: ------------
@@ -384,6 +400,7 @@ echo Package Number Base [%pkgNumberBase%]
 echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
+echo PS3 Output Directory [%pathRemote%]
 echo.
 echo.
 echo.
@@ -410,6 +427,7 @@ echo Package Number Base [%pkgNumberBase%]
 echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
+echo PS3 Output Directory [%pathRemote%]
 echo.
 echo.
 echo.
@@ -428,6 +446,7 @@ echo Package Number Base [%pkgNumberBase%]
 echo Package File [%pkgInput%]
 echo Install Text [%installTextInput%]
 echo IP Address [%ip%]
+echo PS3 Output Directory [%pathRemote%]
 echo.
 echo.
 echo.
@@ -468,8 +487,9 @@ del /f /q %tempFile%
 :: Increase Package ID Number
 set /a pkgNumberBase=%pkgNumberBase%+1
 
-:: Reset Package Install Text
+:: Reset Previous Package Info
 set installTextInput=
+set pkgInput=
 
 :: Set Default New Bubble Choice
 set anotherBubbleChoice=n
